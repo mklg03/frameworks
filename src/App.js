@@ -14,7 +14,7 @@ export default function App() {
   const [notas, agregaNota] = useState(obtenerNotas)
   
   return (
-    <div className="App">
+    <div className="B">
      
     </div>
   );
