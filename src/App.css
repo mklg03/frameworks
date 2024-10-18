@@ -19,17 +19,35 @@
   margin-top: 20px;
 }
 
+
+
 .nota-caja {
-  width: 350px;
-  height: 300px;
-  background-color: #f0f0f0;
+  border: 1px solid #ddd;
   padding: 10px;
-  border: 1px solid #ccc;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
   cursor: pointer;
+  overflow: hidden;
+  width: 200px; /* Fijar el ancho */
+  height: 150px; /* Fijar la altura */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nota-caja strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.nota-caja p {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-height: 100px; /* Ajustar según el tamaño deseado */
 }
+
 
 .popup {
   position: fixed;
