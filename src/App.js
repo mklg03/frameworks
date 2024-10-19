@@ -1,8 +1,8 @@
 
-import './App.css';
+ import './App.css';
 import React, { useState, useEffect } from 'react';
 import { obtenerNotas, añadirNota, actualizarNota, eliminarNota } from './NotasService';
-import Nota from './Nota'; 
+import Nota from './Nota';
 
 export default function App() {
   const [notas, setNotas] = useState(obtenerNotas());
@@ -11,6 +11,7 @@ export default function App() {
   const [contenido, setContenido] = useState('');
   const [notaSeleccionada, setNotaSeleccionada] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
+  const [vistaHorizontal, setVistaHorizontal] = useState(false); // Estado para controlar la vista
 
   useEffect(() => {
     setNotas(obtenerNotas());
@@ -19,8 +20,8 @@ export default function App() {
   const manejarSubmit = (e) => {
     e.preventDefault();
     if (titulo.trim() === '') {
-      alert('El título no puede estar vacío'); // Muestra un mensaje de error si el título está vacío
-      return; 
+      alert('El título no puede estar vacío');
+      return;
     }
     const nuevasNotas = añadirNota(titulo, contenido);
     setNotas(nuevasNotas);
@@ -50,8 +51,8 @@ export default function App() {
   const manejarGuardar = (e) => {
     e.preventDefault();
     if (notaSeleccionada.titulo.trim() === '') {
-      alert('El título no puede estar vacío'); // Muestra un mensaje de error si el título está vacío
-      return; // Sal del manejador para evitar guardar la nota vacía
+      alert('El título no puede estar vacío');
+      return;
     }
     const nuevasNotas = actualizarNota(editIndex, notaSeleccionada.titulo, notaSeleccionada.contenido);
     setNotas(nuevasNotas);
@@ -62,69 +63,74 @@ export default function App() {
     const nuevasNotas = eliminarNota(editIndex);
     setNotas(nuevasNotas);
     cerrarPopup();
-  }
-return (
-  <div className="App">
-    <button className="btn" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
-      +
-    </button>
+  };
 
-    <div className={`form-container ${mostrarFormulario ? 'visible' : 'hidden'}`}>
-      <form onSubmit={manejarSubmit}>
-        <input
-          type="text"
-          className="popup-input"
-          placeholder="Título"
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-        />
-        <input
-          type="text"
-          className="popup-input"
-          placeholder="Contenido"
-          value={contenido}
-          onChange={(e) => setContenido(e.target.value)}
-        />
-        <button className="btn btn-primary" type="submit">Guardar Nota</button>
-      </form>
-    </div>
+  return (
+    <div className="App">
+      <button className="btn" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
+        +
+      </button>
 
-    <div className="notas-container">
-      {notas.map((nota, index) => (
-        <Nota 
-          key={index} 
-          nota={nota} 
-          onClick={() => manejarClickNota(nota, index)} // Llama a manejarClickNota cuando se hace clic en la nota
-        />
-      ))}
-    </div>
+      <button className="btn" onClick={() => setVistaHorizontal(!vistaHorizontal)}>
+      🖵
+      </button>
 
-    {notaSeleccionada && (
-      <div className="popup">
-        <div className="popup-inner">
-          <button className="close-button" onClick={cerrarPopup}>×</button>
-          <form onSubmit={manejarGuardar}>
-            <input
-              type="text"
-              className="popup-input"
-              value={notaSeleccionada.titulo}
-              onChange={manejarCambioTitulo}
-              placeholder="Título"
-            />
-            <textarea
-              className="popup-textarea"
-              value={notaSeleccionada.contenido}
-              onChange={manejarCambioContenido}
-              placeholder="Contenido"
-            />
-            <div className="popup-buttons">
-              <button className="btn btn-primary" type="submit">Guardar Cambios</button>
-              <button type="button" className="btn btn-danger" onClick={manejarEliminar}>Eliminar Nota</button>
-            </div>
-          </form>
-        </div>
+      <div className={`form-container ${mostrarFormulario ? 'visible' : 'hidden'}`}>
+        <form onSubmit={manejarSubmit}>
+          <input
+            type="text"
+            className="popup-input"
+            placeholder="Título"
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+          <input
+            type="text"
+            className="popup-input"
+            placeholder="Contenido"
+            value={contenido}
+            onChange={(e) => setContenido(e.target.value)}
+          />
+          <button className="btn btn-primary" type="submit">Guardar Nota</button>
+        </form>
       </div>
-    )}
-  </div>
-);
- }
+
+      <div className={`notas-container ${vistaHorizontal ? 'horizontal' : 'vertical'}`}>
+        {notas.map((nota, index) => (
+          <Nota 
+            key={index} 
+            nota={nota} 
+            onClick={() => manejarClickNota(nota, index)}
+          />
+        ))}
+      </div>
+
+      {notaSeleccionada && (
+        <div className="popup">
+          <div className="popup-inner">
+            <button className="close-button" onClick={cerrarPopup}>×</button>
+            <form onSubmit={manejarGuardar}>
+              <input
+                type="text"
+                className="popup-input"
+                value={notaSeleccionada.titulo}
+                onChange={manejarCambioTitulo}
+                placeholder="Título"
+              />
+              <textarea
+                className="popup-textarea"
+                value={notaSeleccionada.contenido}
+                onChange={manejarCambioContenido}
+                placeholder="Contenido"
+              />
+              <div className="popup-buttons">
+                <button className="btn btn-primary" type="submit">Guardar Cambios</button>
+                <button type="button" className="btn btn-danger" onClick={manejarEliminar}>Eliminar Nota</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+   }
