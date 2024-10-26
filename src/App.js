@@ -1,8 +1,8 @@
-
- import './App.css';
+import './App.css';
 import React, { useState, useEffect } from 'react';
 import { obtenerNotas, añadirNota, actualizarNota, eliminarNota } from './NotasService';
 import Nota from './Nota';
+import BarraBusqueda from './Components/BarraBusqueda';
 
 export default function App() {
   const [notas, setNotas] = useState(obtenerNotas());
@@ -11,7 +11,8 @@ export default function App() {
   const [contenido, setContenido] = useState('');
   const [notaSeleccionada, setNotaSeleccionada] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
-  const [vistaHorizontal, setVistaHorizontal] = useState(false); // Estado para controlar la vista
+  const [busqueda, setBusqueda] = useState('');
+  const [modoOscuro, setModoOscuro] = useState(false); // Estado para el modo oscuro
 
   useEffect(() => {
     setNotas(obtenerNotas());
@@ -20,7 +21,7 @@ export default function App() {
   const manejarSubmit = (e) => {
     e.preventDefault();
     if (titulo.trim() === '') {
-      alert('El título no puede estar vacío');
+      alert('El título no puede estar vacío'); // Muestra un mensaje de error si el título está vacío
       return;
     }
     const nuevasNotas = añadirNota(titulo, contenido);
@@ -29,6 +30,10 @@ export default function App() {
     setContenido('');
     setMostrarFormulario(false);
   };
+
+  const notasFiltradas = notas.filter((nota) =>
+    nota.titulo.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   const manejarClickNota = (nota, index) => {
     setNotaSeleccionada(nota);
@@ -40,20 +45,8 @@ export default function App() {
     setEditIndex(null);
   };
 
-  const manejarCambioTitulo = (e) => {
-    setNotaSeleccionada({ ...notaSeleccionada, titulo: e.target.value });
-  };
-
-  const manejarCambioContenido = (e) => {
-    setNotaSeleccionada({ ...notaSeleccionada, contenido: e.target.value });
-  };
-
   const manejarGuardar = (e) => {
     e.preventDefault();
-    if (notaSeleccionada.titulo.trim() === '') {
-      alert('El título no puede estar vacío');
-      return;
-    }
     const nuevasNotas = actualizarNota(editIndex, notaSeleccionada.titulo, notaSeleccionada.contenido);
     setNotas(nuevasNotas);
     cerrarPopup();
@@ -66,14 +59,19 @@ export default function App() {
   };
 
   return (
-    <div className="App">
+    <div className={`App ${modoOscuro ? 'modo-oscuro' : ''}`}>
       <button className="btn" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
-        +
+        Agregar Nota
       </button>
 
-      <button className="btn" onClick={() => setVistaHorizontal(!vistaHorizontal)}>
-      🖵
+      <button className="btn" onClick={() => setModoOscuro(!modoOscuro)}>
+        {modoOscuro ? 'Modo Claro' : 'Modo Oscuro'}
       </button>
+
+      <BarraBusqueda
+        valorBusqueda={busqueda}
+        onBuscar={setBusqueda}
+      />
 
       <div className={`form-container ${mostrarFormulario ? 'visible' : 'hidden'}`}>
         <form onSubmit={manejarSubmit}>
@@ -95,12 +93,12 @@ export default function App() {
         </form>
       </div>
 
-      <div className={`notas-container ${vistaHorizontal ? 'horizontal' : 'vertical'}`}>
-        {notas.map((nota, index) => (
-          <Nota 
-            key={index} 
-            nota={nota} 
-            onClick={() => manejarClickNota(nota, index)}
+      <div className="notas-container">
+        {notasFiltradas.map((nota, index) => (
+          <Nota
+            key={index}
+            nota={nota}
+            onClick={() => manejarClickNota(nota, index)} // Usar la función definida aquí
           />
         ))}
       </div>
@@ -114,13 +112,13 @@ export default function App() {
                 type="text"
                 className="popup-input"
                 value={notaSeleccionada.titulo}
-                onChange={manejarCambioTitulo}
+                onChange={(e) => setNotaSeleccionada({ ...notaSeleccionada, titulo: e.target.value })}
                 placeholder="Título"
               />
               <textarea
                 className="popup-textarea"
                 value={notaSeleccionada.contenido}
-                onChange={manejarCambioContenido}
+                onChange={(e) => setNotaSeleccionada({ ...notaSeleccionada, contenido: e.target.value })}
                 placeholder="Contenido"
               />
               <div className="popup-buttons">
@@ -133,4 +131,4 @@ export default function App() {
       )}
     </div>
   );
-   }
+}
